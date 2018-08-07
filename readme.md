@@ -102,11 +102,15 @@ verb: :post
 
 Value can be string or symbol, default is nil.
 
-Example:
+Examples:
 
-    r.define_rule(:match => '/resource/.*', :metric => :rph, :type => :fixed, :limit => 1, :per_url => true)
+    r.define_rule(match: '/resource/.*', metric: :rph, type: :fixed, limit: 1, :per_url => true)
 
-This example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
+The above example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
+
+    r.define_rule(match: '/resource/foo', metric: :rph, type: :fixed, limit: 1, per_url: true, verb: :get)
+
+The above example will let 1 GET request per hour to '/resource/foo'
 
 Limit Entry Storage
 ----------------
