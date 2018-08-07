@@ -108,7 +108,7 @@ class RateLimiting
 
   def find_matching_rule(request)
     @rules.each do |rule|
-      return rule if request.path =~ rule.match
+      return rule if rule.match?(request)
     end
     nil
   end
@@ -141,7 +141,9 @@ class RateLimiting
   end
 
   def get_header(times, reset, limit)
-    { "x-RateLimit-Limit" => limit.to_s, "x-RateLimit-Remaining" => (limit - times).to_s, "x-RateLimit-Reset" => reset.strftime("%d%m%y%H%M%S") }
+    { "x-RateLimit-Limit" => limit.to_s,
+      "x-RateLimit-Remaining" => (limit - times).to_s,
+      "x-RateLimit-Reset" => reset.strftime("%d%m%y%H%M%S") }
   end
 
   def xml_error(code, message)

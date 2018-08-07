@@ -1,6 +1,4 @@
-[![Build status](https://img.shields.io/travis/iugu/rate-limiting.svg)](https://travis-ci.org/iugu/rate-limiting)
-[![Gem version](https://img.shields.io/gem/v/rate-limiting.svg)](https://rubygems.org/gems/rate-limiting)
-[![Downloads](https://img.shields.io/gem/dt/rate-limiting.svg)](https://rubygems.org/gems/rate-limiting)
+[![CircleCI](https://circleci.com/gh/wearemolecule/rate-limiting.svg?style=svg)](https://circleci.com/gh/wearemolecule/rate-limiting)
 
 Rate Limiting
 ===============
@@ -17,35 +15,36 @@ How to use it
 
 Gemfile
 
-     gem 'rate-limiting'
+```ruby
+gem 'rate-limiting'
+```
 
 config/application.rb
 
-     require "rate_limiting"
+```ruby
+require "rate_limiting"
 
-     class Application < Rails::Application
+class Application < Rails::Application
 
-       config.middleware.use RateLimiting do |r|
+ config.middleware.use RateLimiting do |r|
+   # Add your rules here, ex:
 
-         # Add your rules here, ex:
-
-         r.define_rule( :match => '/resource', :type => :fixed, :metric => :rph, :limit => 300 )
-         r.define_rule(:match => '/html', :limit => 1)
-         r.define_rule(:match => '/json', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/xml', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/token/ip', :limit => 1, :token => :id, :per_ip => true)
-         r.define_rule(:match => '/token', :limit => 1, :token => :id, :per_ip => false)
-         r.define_rule(:match => '/fixed/rpm', :metric => :rpm, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/fixed/rph', :metric => :rph, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/fixed/rpd', :metric => :rpd, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/freq/rpm', :metric => :rpm, :type => :frequency, :limit => 1)
-         r.define_rule(:match => '/freq/rph', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/freq/rpd', :metric => :rpd, :type => :frequency, :limit => 1440)
-         r.define_rule(:match => '/header', :metric => :rph, :type => :frequency, :limit => 60)
-
-       end
-
-     end
+   r.define_rule(match: '/resource', type: :fixed, metric: :rph, limit: 300)
+   r.define_rule(match: '/html', limit: 1)
+   r.define_rule(match: '/json', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/xml', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/token/ip', limit: 1, token: :id, per_ip: true)
+   r.define_rule(match: '/token', limit: 1, token: :id, per_ip: false)
+   r.define_rule(match: '/fixed/rpm', metric: :rpm, type: :fixed, limit: 1)
+   r.define_rule(match: '/fixed/rph', metric: :rph, type: :fixed, limit: 1)
+   r.define_rule(match: '/fixed/rpd', metric: :rpd, type: :fixed, limit: 1)
+   r.define_rule(match: '/freq/rpm', metric: :rpm, type: :frequency, limit: 1)
+   r.define_rule(match: '/freq/rph', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/freq/rpd', metric: :rpd, type: :frequency, limit: 1440)
+   r.define_rule(match: '/header', metric: :rph, type: :frequency, limit: 60)
+ end
+end
+```
 
 
 Rule Options
@@ -57,32 +56,42 @@ Accepts aimed resource path or Regexp like '/resource' or "/resource/.*"
 
 ### metric
 
+```
 :rpd  -  Requests per Day
 
 :rph  -  Requests per Hour
 
 :rpm  -  Requests per Minute
+```
 
 ### type
 
+```
 :frequency  -  1 request per (time/limit)
 
 :fixed - limit requests per time
+```
 
 Examples:
 
-      r.define_rule(:match => "/resource", :metric => :rph, :type => :frequency, :limit => 3)
+```ruby
+r.define_rule(match: "/resource", metric: :rph, type: :frequency, limit: 3)
+```
 
-      => 1 request every 20 min
+Limits to 1 request every 20 min
 
-      r.define_rule(:match => "/resource", :metric => :rph, :type => :fixed, :limit => 3)
+```ruby
+r.define_rule(:match => "/resource", metric: :rph, type: :fixed, limit: 3)
+```
 
-      => 3 request every 60 min
+Limits to 3 requests every 60 min
 
 
 ### token
 
+```
 :foo - limit by request parameter 'foo'
+```
 
 ### per_ip
 
@@ -93,25 +102,44 @@ Boolean, true = limit by IP
 Option used when the match option is a Regexp.
 If true, it will limit every url catch separately.
 
-Example:
+### verb
 
-    r.define_rule(:match => '/resource/.*', :metric => :rph, :type => :fixed, :limit => 1, :per_url => true)
+Option used only when `per_url` is true. Designate a specific verb to filter 
+the designated URL on. For instance to limit for POSTS only, set:
 
-This example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
+```ruby
+verb: :post
+```
+
+Value can be string or symbol, default is nil.
+
+Examples:
+
+```ruby
+r.define_rule(match: '/resource/.*', metric: :rph, type: :fixed, limit: 1, :per_url => true)
+```
+
+The above example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
+
+```ruby
+r.define_rule(match: '/resource/foo', metric: :rph, type: :fixed, limit: 1, per_url: true, verb: :get)
+```
+
+The above example will let 1 GET request per hour to '/resource/foo'
 
 Limit Entry Storage
 ----------------
 By default, the record store used to keep track of request matches is a hash stored as a class instance variable in app instance memory. For a distributed or concurrent application, this will not yeild desired results and should be changed to a different store.
 
 Set the cache by calling `set_cache` in the configuration block
-```
+```ruby
 r.set_cache(Rails.cache)
 ```
 
 Any traditional store will work, including Memcache, Redis, or an ActiveSupport::Cache::Store. Which is the best choice is an application specific decision, but a fast, shared store is highly recommended.
 
 A more robust cache configuration example:
-```
+```ruby
 store = case
 when ENV['REDIS_RATE_LIMIT_URL'].present?
   # use a separate redis DB
