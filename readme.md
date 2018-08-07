@@ -15,10 +15,13 @@ How to use it
 
 Gemfile
 
+```ruby
      gem 'rate-limiting'
+```
 
 config/application.rb
 
+```ruby
      require "rate_limiting"
 
      class Application < Rails::Application
@@ -44,6 +47,7 @@ config/application.rb
        end
 
      end
+```
 
 
 Rule Options
@@ -55,11 +59,13 @@ Accepts aimed resource path or Regexp like '/resource' or "/resource/.*"
 
 ### metric
 
-:rpd  -  Requests per Day
+```ruby
+:rpd  #  Requests per Day
 
-:rph  -  Requests per Hour
+:rph  #  Requests per Hour
 
-:rpm  -  Requests per Minute
+:rpm  #  Requests per Minute
+```
 
 ### type
 
@@ -69,12 +75,15 @@ Accepts aimed resource path or Regexp like '/resource' or "/resource/.*"
 
 Examples:
 
+```ruby
       r.define_rule(:match => "/resource", :metric => :rph, :type => :frequency, :limit => 3)
+```
 
       => 1 request every 20 min
 
+```ruby
       r.define_rule(:match => "/resource", :metric => :rph, :type => :fixed, :limit => 3)
-
+```
       => 3 request every 60 min
 
 
@@ -104,11 +113,15 @@ Value can be string or symbol, default is nil.
 
 Examples:
 
+```ruby
     r.define_rule(match: '/resource/.*', metric: :rph, type: :fixed, limit: 1, :per_url => true)
+```
 
 The above example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
 
+```ruby
     r.define_rule(match: '/resource/foo', metric: :rph, type: :fixed, limit: 1, per_url: true, verb: :get)
+```
 
 The above example will let 1 GET request per hour to '/resource/foo'
 
@@ -117,14 +130,14 @@ Limit Entry Storage
 By default, the record store used to keep track of request matches is a hash stored as a class instance variable in app instance memory. For a distributed or concurrent application, this will not yeild desired results and should be changed to a different store.
 
 Set the cache by calling `set_cache` in the configuration block
-```
+```ruby
 r.set_cache(Rails.cache)
 ```
 
 Any traditional store will work, including Memcache, Redis, or an ActiveSupport::Cache::Store. Which is the best choice is an application specific decision, but a fast, shared store is highly recommended.
 
 A more robust cache configuration example:
-```
+```ruby
 store = case
 when ENV['REDIS_RATE_LIMIT_URL'].present?
   # use a separate redis DB
