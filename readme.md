@@ -91,6 +91,17 @@ Boolean, true = limit by IP
 Option used when the match option is a Regexp.
 If true, it will limit every url catch separately.
 
+### verb
+
+Option used only when `per_url` is true. Designate a specific verb to filter 
+the designated URL on. For instance to limit for POSTS only, set:
+
+```ruby
+verb: :post
+```
+
+Value can be string or symbol, default is nil.
+
 Example:
 
     r.define_rule(:match => '/resource/.*', :metric => :rph, :type => :fixed, :limit => 1, :per_url => true)
