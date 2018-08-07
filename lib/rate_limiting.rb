@@ -108,9 +108,7 @@ class RateLimiting
 
   def find_matching_rule(request)
     @rules.each do |rule|
-      if rule.match?(request)
-        return rule
-      end
+      return rule if rule.match?(request)
     end
     nil
   end
