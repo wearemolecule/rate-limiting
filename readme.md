@@ -16,37 +16,34 @@ How to use it
 Gemfile
 
 ```ruby
-     gem 'rate-limiting'
+gem 'rate-limiting'
 ```
 
 config/application.rb
 
 ```ruby
-     require "rate_limiting"
+require "rate_limiting"
 
-     class Application < Rails::Application
+class Application < Rails::Application
 
-       config.middleware.use RateLimiting do |r|
+ config.middleware.use RateLimiting do |r|
+   # Add your rules here, ex:
 
-         # Add your rules here, ex:
-
-         r.define_rule( :match => '/resource', :type => :fixed, :metric => :rph, :limit => 300 )
-         r.define_rule(:match => '/html', :limit => 1)
-         r.define_rule(:match => '/json', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/xml', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/token/ip', :limit => 1, :token => :id, :per_ip => true)
-         r.define_rule(:match => '/token', :limit => 1, :token => :id, :per_ip => false)
-         r.define_rule(:match => '/fixed/rpm', :metric => :rpm, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/fixed/rph', :metric => :rph, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/fixed/rpd', :metric => :rpd, :type => :fixed, :limit => 1)
-         r.define_rule(:match => '/freq/rpm', :metric => :rpm, :type => :frequency, :limit => 1)
-         r.define_rule(:match => '/freq/rph', :metric => :rph, :type => :frequency, :limit => 60)
-         r.define_rule(:match => '/freq/rpd', :metric => :rpd, :type => :frequency, :limit => 1440)
-         r.define_rule(:match => '/header', :metric => :rph, :type => :frequency, :limit => 60)
-
-       end
-
-     end
+   r.define_rule( match: '/resource', type: :fixed, metric: :rph, limit: 300 )
+   r.define_rule(match: '/html', limit: 1)
+   r.define_rule(match: '/json', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/xml', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/token/ip', limit: 1, token: :id, per_ip: true)
+   r.define_rule(match: '/token', limit: 1, token: :id, per_ip: false)
+   r.define_rule(match: '/fixed/rpm', metric: :rpm, type: :fixed, limit: 1)
+   r.define_rule(match: '/fixed/rph', metric: :rph, type: :fixed, limit: 1)
+   r.define_rule(match: '/fixed/rpd', metric: :rpd, type: :fixed, limit: 1)
+   r.define_rule(match: '/freq/rpm', metric: :rpm, type: :frequency, limit: 1)
+   r.define_rule(match: '/freq/rph', metric: :rph, type: :frequency, limit: 60)
+   r.define_rule(match: '/freq/rpd', metric: :rpd, type: :frequency, limit: 1440)
+   r.define_rule(match: '/header', metric: :rph, type: :frequency, limit: 60)
+ end
+end
 ```
 
 
@@ -76,13 +73,13 @@ Accepts aimed resource path or Regexp like '/resource' or "/resource/.*"
 Examples:
 
 ```ruby
-      r.define_rule(:match => "/resource", :metric => :rph, :type => :frequency, :limit => 3)
+r.define_rule(:match => "/resource", metric: :rph, type: :frequency, limit: 3)
 ```
 
       => 1 request every 20 min
 
 ```ruby
-      r.define_rule(:match => "/resource", :metric => :rph, :type => :fixed, :limit => 3)
+r.define_rule(:match => "/resource", metric: :rph, type: :fixed, limit: 3)
 ```
       => 3 request every 60 min
 
@@ -114,13 +111,13 @@ Value can be string or symbol, default is nil.
 Examples:
 
 ```ruby
-    r.define_rule(match: '/resource/.*', metric: :rph, type: :fixed, limit: 1, :per_url => true)
+r.define_rule(match: '/resource/.*', metric: :rph, type: :fixed, limit: 1, :per_url => true)
 ```
 
 The above example will let 1 request per hour for each url caught. ('/resource/url1', '/resource/url2', etc...)
 
 ```ruby
-    r.define_rule(match: '/resource/foo', metric: :rph, type: :fixed, limit: 1, per_url: true, verb: :get)
+r.define_rule(match: '/resource/foo', metric: :rph, type: :fixed, limit: 1, per_url: true, verb: :get)
 ```
 
 The above example will let 1 GET request per hour to '/resource/foo'
