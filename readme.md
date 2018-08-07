@@ -29,7 +29,7 @@ class Application < Rails::Application
  config.middleware.use RateLimiting do |r|
    # Add your rules here, ex:
 
-   r.define_rule( match: '/resource', type: :fixed, metric: :rph, limit: 300 )
+   r.define_rule(match: '/resource', type: :fixed, metric: :rph, limit: 300)
    r.define_rule(match: '/html', limit: 1)
    r.define_rule(match: '/json', metric: :rph, type: :frequency, limit: 60)
    r.define_rule(match: '/xml', metric: :rph, type: :frequency, limit: 60)
@@ -56,32 +56,35 @@ Accepts aimed resource path or Regexp like '/resource' or "/resource/.*"
 
 ### metric
 
-```ruby
-:rpd  #  Requests per Day
+```
+:rpd  -  Requests per Day
 
-:rph  #  Requests per Hour
+:rph  -  Requests per Hour
 
-:rpm  #  Requests per Minute
+:rpm  -  Requests per Minute
 ```
 
 ### type
 
+```
 :frequency  -  1 request per (time/limit)
 
 :fixed - limit requests per time
+```
 
 Examples:
 
 ```ruby
-r.define_rule(:match => "/resource", metric: :rph, type: :frequency, limit: 3)
+r.define_rule(match: "/resource", metric: :rph, type: :frequency, limit: 3)
 ```
 
-      => 1 request every 20 min
+Limits to 1 request every 20 min
 
 ```ruby
 r.define_rule(:match => "/resource", metric: :rph, type: :fixed, limit: 3)
 ```
-      => 3 request every 60 min
+
+Limits to 3 requests every 60 min
 
 
 ### token
