@@ -29,7 +29,6 @@ def app
     r.define_rule(match: "/per_url/.*", metric: :rph, type: :frequency, limit: 60, per_url: true)
     r.define_rule(match: "/verb/post", metric: :rpm, type: :frequency, limit: 1, verb: :post, per_url: true)
     r.define_rule(match: "/verb/get", metric: :rpm, type: :frequency, limit: 1, verb: :get, per_url: true)
-    r.define_rule(match: "/verb/update", metric: :rpm, type: :frequency, limit: 1, verb: :update, per_url: true)
   end
 end
 
