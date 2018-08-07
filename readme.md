@@ -89,7 +89,9 @@ Limits to 3 requests every 60 min
 
 ### token
 
+```
 :foo - limit by request parameter 'foo'
+```
 
 ### per_ip
 
